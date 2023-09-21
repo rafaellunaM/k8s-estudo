@@ -35,3 +35,22 @@ spec:
       port: 80
       targetPort: 80
   type: LoadBalancer # Altere para NodePort, ClusterIP ou LoadBalancer, dependendo de suas necessidades
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: rafael.testeingress.internal
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80
+
