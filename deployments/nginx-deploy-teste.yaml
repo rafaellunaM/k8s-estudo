@@ -1,11 +1,9 @@
-# nginx-deployment.yaml
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-deployment
 spec:
-  replicas: 3 # O número desejado de réplicas
+  replicas: 3
   selector:
     matchLabels:
       app: nginx
@@ -16,13 +14,11 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:latest # Imagem do Docker Hub que você deseja implantar
+        image: nginx:latest
         ports:
         - containerPort: 80
 
 ---
-# nginx-service.yaml
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -34,7 +30,8 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 80
-  type: LoadBalancer # Altere para NodePort, ClusterIP ou LoadBalancer, dependendo de suas necessidades
+  type: LoadBalancer
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -43,7 +40,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: rafael.testeingress.internal
+    - host: nginx.rafaelteste.internal
       http:
         paths:
           - path: /
@@ -53,4 +50,3 @@ spec:
                 name: nginx-service
                 port:
                   number: 80
-
