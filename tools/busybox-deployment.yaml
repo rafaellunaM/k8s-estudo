@@ -12,6 +12,7 @@ spec:
       labels:
         app: busybox
     spec:
+      dnsPolicy: Default
       containers:
       - name: busybox
         image: busybox
