@@ -13,11 +13,19 @@ data:
                 "name": "prometheus",
                 "orgId": 1,
                 "type": "prometheus",
-                "url": "http://prometheus-service.monitoring.svc:8080",
+                "url": "prometheus.rafaelteste.internal",
                 "version": 1
             }
         ]
     }
+  grafana.ini: |-
+    [database]
+      type = postgres
+      host = 30.30.30.243
+      name = grafana
+      user = postgres
+      password = admin123
+      ssl_mode = disable
 ---
 apiVersion: apps/v1
 kind: Deployment
