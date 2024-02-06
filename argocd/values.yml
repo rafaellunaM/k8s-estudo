@@ -1,0 +1,119 @@
+## Argo Configs
+configs:
+  params:
+    server.insecure: true
+    redis.server: "ip:porta"
+    redis.db: 5
+    
+  ####################
+  # ssh repositories #
+  ####################
+  ssh:
+    extraHosts:
+  
+  ################
+  # Repositories #
+  ################
+
+  # -- Repositories list to be used by applications
+  ## Creates a secret for each key/value specified below to create repositories
+  ## Note: the last example in the list would use a repository credential template, configured under "configs.credentialTemplates".
+  repositories:
+    private-test-argocd:
+      url: url
+      name: private-repo
+      type: git
+      username:
+      password: 
+
+
+  ###############
+  # policy rbac #
+  ###############
+  # Ref: https://argo-cd.readthedocs.io/en/stable/operator-manual/rbac/
+  rbac:
+    create: true
+    policy.default: "role:admin"
+    policy.csv: |
+      p, role:org-admin, applications, *, */*, allow
+      p, role:org-admin, clusters, get, *, allow
+      p, role:org-admin, repositories, get, *, allow
+      p, role:org-admin, repositories, create, *, allow
+      p, role:org-admin, repositories, update, *, allow
+      p, role:org-admin, repositories, delete, *, allow
+      p, role:org-admin, projects, get, *, allow
+      p, role:org-admin, projects, create, *, allow
+      p, role:org-admin, projects, update, *, allow
+      p, role:org-admin, projects, delete, *, allow
+      p, role:org-admin, logs, get, *, allow
+      p, role:org-admin, exec, create, */*, allow
+
+  #############
+  # configmap #
+  #############
+  cm:
+    url: xxxx
+
+  ############
+  # Keycloak #
+  ############
+    oidc.config: |
+       name: Keycloak
+       issuer: "url"
+       clientID: argocd
+       clientSecret: $oidc-keycloak
+       requestedScopes:
+         - openid
+         - profile
+         - email
+         - groups
+       requestedIDTokenClaims:
+         groups:
+           essential: true
+
+  ###################
+  # secret keycloak #
+  ###################
+  secret:
+    extra:
+      oidc-keycloak: "kVDHordqAeRG4WykThi06235NtL1uo8m"
+
+secretManifests:
+    - secrets.yaml
+
+################
+# ingress nginx #
+################
+server:
+  ingress:
+    enabled: true
+    hosts:
+      - url
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/proxy-real-ip-cidr: "0.0.0.0/0"
+    tls:
+      - secretName: wildcard-xxx-xxx
+        hosts:
+          - url
+    https: true
+
+redis:
+  enabled: false
+
+argocdConfig:
+  configManagementPlugins: |
+    - name: keycloak
+      init:
+        command: ["argocd-keycloak"]
+      generate: |
+        command: ["argocd-keycloak", "generate"]
+      validate: |
+        command: ["argocd-keycloak", "validate"]
+
+  repositories: |
+    - url: https://github.com/argoproj/argocd-example-apps.git
+      sshPrivateKeySecret: |
+        name: argocd-repo-secret
+        key: sshPrivateKey
